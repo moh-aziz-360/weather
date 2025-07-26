@@ -21,8 +21,9 @@ const Weather = () => {
     if (savedUnit) setUnit(savedUnit);
     const savedFavorites = localStorage.getItem("weatherFavorites");
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
-    const savedTheme = localStorage.getItem("weatherTheme");
-    if (savedTheme) setTheme(savedTheme);
+    const savedTheme = localStorage.getItem("weatherTheme") || 'dark';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
   const saveToRecent = (city) => {
@@ -115,6 +116,13 @@ const Weather = () => {
     if (location) handleWeatherFetch(location);
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem("weatherTheme", newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
   useEffect(() => {
     handleWeatherFetch(location);
   }, []);
@@ -168,7 +176,7 @@ const Weather = () => {
         <div className="header">
           <h1>🌤️ Weather Pro</h1>
           <div className="header-controls">
-            <button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+            <button className="theme-toggle" onClick={toggleTheme}>
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
           </div>
