@@ -6,6 +6,16 @@ export const formatDate = (timestamp) => {
   });
 };
 
+export const getTimeOfDay = (timestamp, sunrise, sunset) => {
+  const time = timestamp * 1000;
+  const sunriseTime = sunrise * 1000;
+  const sunsetTime = sunset * 1000;
+  
+  if (time < sunriseTime) return 'night';
+  if (time < sunsetTime) return 'day';
+  return 'night';
+};
+
 export const getWindDirection = (degrees) => {
   const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
   return directions[Math.round(degrees / 22.5) % 16];
@@ -33,4 +43,50 @@ export const debounce = (func, delay) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func.apply(null, args), delay);
   };
+};
+
+export const getWeatherRecommendation = (weather) => {
+  const temp = weather.main.temp;
+  const condition = weather.weather[0].main.toLowerCase();
+  const humidity = weather.main.humidity;
+  const windSpeed = weather.wind.speed;
+
+  let recommendations = [];
+
+  if (temp < 10) recommendations.push('🧥 Wear warm clothing');
+  else if (temp > 30) recommendations.push('🩳 Light clothing recommended');
+  
+  if (condition.includes('rain')) recommendations.push('☂️ Don\'t forget your umbrella');
+  if (condition.includes('snow')) recommendations.push('❄️ Drive carefully, icy conditions');
+  if (windSpeed > 10) recommendations.push('💨 Windy conditions, secure loose items');
+  if (humidity > 80) recommendations.push('💧 High humidity, stay hydrated');
+  
+  return recommendations;
+};
+
+export const getComfortLevel = (temp, humidity) => {
+  const heatIndex = temp + (0.5 * (humidity - 10));
+  
+  if (heatIndex < 15) return { level: 'Cold', color: '#3b82f6', icon: '🥶' };
+  if (heatIndex < 25) return { level: 'Cool', color: '#06b6d4', icon: '😊' };
+  if (heatIndex < 30) return { level: 'Comfortable', color: '#10b981', icon: '😌' };
+  if (heatIndex < 35) return { level: 'Warm', color: '#f59e0b', icon: '😅' };
+  return { level: 'Hot', color: '#ef4444', icon: '🥵' };
+};
+
+export const getMoonPhase = (date) => {
+  const phases = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
+  const cycle = 29.53;
+  const known = new Date('2000-01-06'); // Known new moon
+  const diff = (date - known) / (1000 * 60 * 60 * 24);
+  const phase = ((diff % cycle) / cycle) * 8;
+  return phases[Math.floor(phase)];
+};
+
+export const formatWindSpeed = (speed, unit) => {
+  if (unit === 'imperial') {
+    return `${speed} mph`;
+  }
+  const kmh = (speed * 3.6).toFixed(1);
+  return `${speed} m/s (${kmh} km/h)`;
 };
